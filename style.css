@@ -1,0 +1,190 @@
+body {
+    background-color: #f8e8ff;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    padding-top: 100px;
+}
+
+h1 {
+    color: #8b3d9b;
+}
+
+button {
+    background-color: #a181c7;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 14px;
+    cursor: pointer;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 5px 15px #8c6ab055;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+#verify {
+    display: none;
+}
+#verify button {
+    position: static;
+    transform: none;
+    margin: 10px;
+}
+#continueBtn {
+    display: none;
+}
+#loading {
+    display: none;
+}
+#bar {
+    width: 70%;
+    height: 25px;
+    accent-color: purple;
+}
+#percent {
+    font-size: 30px;
+    font-weight: bold;
+}
+#nextBtn {
+    display: none;
+    position: static;
+    transform: none;
+    margin: 20px;
+}
+#quiz {
+    display: none;
+}
+#quiz button {
+    position: static;
+    transform: none;
+    margin: 8px;
+}
+#nextQ:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+#counter {
+    color: purple;
+    font-weight: bold;
+    font-size: 14px;
+}
+#quiz h3 {
+    color: purple;
+    font-size: 30px;
+}
+
+#giftNext {
+    background: gold;
+    color: black;
+}
+
+#gifts {
+    display: none;
+}
+
+#boxBtn {
+    position: static;
+    transform: none;
+    margin: 20px;
+    padding: 20px;
+    font-size: 22px;
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+@keyframes warning {
+    0%, 100% { color: red; }
+    50% { color: white; }
+}
+
+.escape {
+    animation: shake 0.2s 5;
+}
+
+.danger {
+    animation: warning 0.5s infinite;
+    font-weight: bold;
+}
+.confetti {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 999;
+    animation: fall 4s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+#tease {
+    position: fixed;
+    bottom: 15%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: purple;
+    pointer-events: none;
+}
+body {
+    background: linear-gradient(135deg, #faf5ff, #f1e8ff, #ffeef7);
+    color: #493d59;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    color: #8b3d9b;
+    letter-spacing: 1px;
+}
+
+p {
+    line-height: 1.6;
+}
+
+button:hover {
+    background-color: #8965b5;
+    box-shadow: 0 8px 20px #9d7bc766;
+}
+
+button:active {
+    background-color: #7653a3;
+}
+
+#welcome h1 {
+    margin-bottom: 20px;
+}
+
+#welcome p {
+    margin: 15px auto;
+    max-width: 90%;
+}
+
+#welcome #tease {
+    margin: 0;
+}
+
+#verify, #loading, #quiz, #gifts { width: 90%; max-width: 600px; margin: 0 auto; box-sizing: border-box; }
+#bar { max-width: 100%; }
+@media (max-width: 600px) { body { padding-top: 60px; }
+h2 {
+    font-size: 24px;
+}
+
+button {
+    font-size: 14px;
+    padding: 12px 18px;
+}
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>birthday.exe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="welcome">
+        <h1>Happy birthday!</h1>
+        <p>Someone has prepared a surprise for you..</p>
+        <button id="giftButton">Open your gift</button>
+        <p id="tease"></p>
+    </div>
+    <div id="verify">
+        <h2> IDENTITY VERIFICATION</h2>
+        <p>Are you really my brother?</p>
+        <button id="yesBtn">YES</button>
+        <button id="noBtn">NO</button>
+        <p id="result"></p>
+        <button id="continueBtn">Verify anyway</button>
+    </div>
+    <div id="loading">
+        <h2>Preparing your gift..</h2>
+        <p id="percent">0%</p>
+        <progress id="bar" value="0" max="100"></progress>
+        <p id="status">Please wait..</p>
+        <button id="nextBtn">Continue anyway</button>
+    </div>
+
+    <div id="quiz">
+        <h2>OFFICIAL BROTHER EXAM</h2>
+        <p id="counter"></p>
+        <P id="question"></P>
+        <button id="a"></button>
+        <button id="b"></button>
+        <p id="feedback"></p>
+        <button id="nextQ">Next question</button>
+    </div>
+
+    <div id="gifts">
+        <h2>YOUR REWARD HAS ARRIVED</h2>
+        <P>Definitely not suspicious.</P>
+        <button id="boxBtn">[OPEN GIFT ]</button>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
