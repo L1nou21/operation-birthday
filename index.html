@@ -1,50 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>birthday.exe</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#faf5ff">
+  <title>Operation Birthday.exe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="welcome">
+  <main>
+    <section id="welcome" class="screen welcome-screen">
+      <div class="welcome-heading">
         <h1>Happy birthday!</h1>
         <p>Someone has prepared a surprise for you..</p>
-        <button id="giftButton">Open your gift</button>
-        <p id="tease"></p>
-    </div>
-    <div id="verify">
-        <h2> IDENTITY VERIFICATION</h2>
+      </div>
+      <button id="giftButton" class="escape-button" type="button">Open your gift</button>
+      <div id="teasePanel" class="tease-panel" aria-live="polite">
+        <p id="tease">Go ahead. Try to catch your gift.</p>
+        <span id="escapeCounter">ESCAPE ATTEMPT 0/10</span>
+      </div>
+    </section>
+
+    <section id="verify" class="screen content-screen" hidden>
+      <div class="panel">
+        <span class="eyebrow">SECURITY CHECKPOINT 01</span>
+        <h2>IDENTITY VERIFICATION</h2>
         <p>Are you really my brother?</p>
-        <button id="yesBtn">YES</button>
-        <button id="noBtn">NO</button>
-        <p id="result"></p>
-        <button id="continueBtn">Verify anyway</button>
-    </div>
-    <div id="loading">
+        <div class="button-row">
+          <button id="yesBtn" type="button">YES</button>
+          <button id="noBtn" type="button">NO</button>
+        </div>
+        <p id="result" class="feedback" aria-live="polite"></p>
+        <button id="continueBtn" type="button" hidden>Verify anyway</button>
+      </div>
+    </section>
+
+    <section id="loading" class="screen content-screen" hidden>
+      <div class="panel">
+        <span class="eyebrow">SECURITY CHECKPOINT 02</span>
         <h2>Preparing your gift..</h2>
-        <p id="percent">0%</p>
-        <progress id="bar" value="0" max="100"></progress>
-        <p id="status">Please wait..</p>
-        <button id="nextBtn">Continue anyway</button>
-    </div>
+        <p id="percent" class="big-percent">0%</p>
+        <progress id="bar" value="0" max="100">0%</progress>
+        <p id="status" class="feedback" aria-live="polite">Please wait..</p>
+        <div id="cakeEscapeScene" class="cake-escape-scene" hidden aria-label="A tiny birthday cake is running away">
+          <div class="runaway-cake" aria-hidden="true">
+            <div class="runaway-flame"></div>
+            <div class="runaway-candle"></div>
+            <div class="runaway-icing"></div>
+            <div class="runaway-base"></div>
+            <div class="runaway-legs"><i></i><i></i></div>
+          </div>
+          <span class="runaway-caption">CATCH ME IF YOU CAN!</span>
+        </div>
+        <button id="nextBtn" type="button" hidden>Continue anyway</button>
+      </div>
+    </section>
 
-    <div id="quiz">
+    <section id="quiz" class="screen content-screen" hidden>
+      <div class="panel">
+        <span class="eyebrow">SECURITY CHECKPOINT 03</span>
         <h2>OFFICIAL BROTHER EXAM</h2>
-        <p id="counter"></p>
-        <P id="question"></P>
-        <button id="a"></button>
-        <button id="b"></button>
-        <p id="feedback"></p>
-        <button id="nextQ">Next question</button>
-    </div>
+        <p id="counter" class="question-counter"></p>
+        <p id="question" class="question"></p>
+        <div class="answer-list">
+          <button id="a" type="button"></button>
+          <button id="b" type="button"></button>
+          <button id="c" type="button"></button>
+        </div>
+        <p id="feedback" class="feedback" aria-live="polite"></p>
+        <button id="nextQ" type="button" disabled>Next question</button>
+      </div>
+    </section>
 
-    <div id="gifts">
+    <section id="gifts" class="screen content-screen" hidden>
+      <div class="panel">
+        <span class="eyebrow">REWARD UNLOCKED</span>
         <h2>YOUR REWARD HAS ARRIVED</h2>
-        <P>Definitely not suspicious.</P>
-        <button id="boxBtn">[OPEN GIFT ]</button>
-    </div>
-    
-    <script src="script.js"></script>
+        <p id="giftMessage">Definitely not suspicious.</p>
+        <button id="boxBtn" type="button" aria-label="Open gift">
+          <span class="gift-lid"><span class="gift-bow"></span></span>
+          <span class="gift-body"></span>
+          <span class="gift-label">OPEN GIFT</span>
+        </button>
+      </div>
+    </section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>

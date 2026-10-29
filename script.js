@@ -1,223 +1,301 @@
-const giftButton = document.getElementById("giftButton");
+// Operation Birthday.exe — complete updated edition.
+const $ = id => document.getElementById(id);
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(screen => { screen.hidden = screen.id !== id; });
+  window.scrollTo(0, 0);
+}
 
-giftButton.addEventListener("click", function() {
-    alert("ERROR 404: Gift not found!.");
-
-    giftButton.style.display = "none";
-    document.getElementById("welcome").style.display = "none";
-    document.getElementById("verify").style.display = "block";
+// 1. The impossible-to-catch gift.
+const giftButton = $('giftButton');
+const teasing = [
+  'Too slow grandpa.',
+  'Your reflexes need an update..',
+  'Even a penguin could catch this.',
+  'Are you even trying?',
+  'Maybe try using both hands',
+  'This is getting embarrassing',
+  'Your mouse needs a coffee break.',
+  'The gift has trust issues.',
+  "One last chance. Don't embarrass yourself",
+  'Fine you win, Happy now?'
+];
+let escapes = 0;
+let lastEscapeAt = 0;
+let previousX = 50, previousY = 52;
+function escapeGift(event) {
+  if (escapes >= teasing.length) return;
+  const now = Date.now();
+  if (now - lastEscapeAt < 300) return;
+  lastEscapeAt = now;
+  if (event && event.cancelable && event.type === 'pointerdown') event.preventDefault();
+  escapes++;
+  $('tease').textContent = teasing[escapes - 1];
+  $('escapeCounter').textContent = `ESCAPE ATTEMPT ${escapes}/${teasing.length}`;
+  const bubble = $('teasePanel');
+  bubble.classList.remove('pop');
+  void bubble.offsetWidth;
+  bubble.classList.add('pop');
+  if (escapes === teasing.length) {
+    giftButton.style.left = '50%';
+    giftButton.style.top = '52%';
+    giftButton.classList.add('ready');
+    return;
+  }
+  // Keep the moving button within the visible screen, away from the speech bubble.
+  const rect = giftButton.getBoundingClientRect();
+  const halfW = rect.width / 2 + 12;
+  const halfH = rect.height / 2 + 12;
+  const bubbleTop = bubble.getBoundingClientRect().top;
+  const maxY = Math.max(halfH + 15, Math.min(bubbleTop - halfH - 18, innerHeight - halfH - 15));
+  const minY = Math.min(maxY, Math.max(halfH + 15, Math.min(innerHeight * .26, maxY)));
+  const minX = halfW + 10, maxX = Math.max(minX, innerWidth - halfW - 10);
+  let x, y;
+  for (let attempt = 0; attempt < 12; attempt++) {
+    x = minX + Math.random() * (maxX - minX);
+    y = minY + Math.random() * Math.max(0, maxY - minY);
+    if (Math.hypot(x - previousX / 100 * innerWidth, y - previousY / 100 * innerHeight) > 90) break;
+  }
+  previousX = x / innerWidth * 100;
+  previousY = y / innerHeight * 100;
+  giftButton.style.left = `${x}px`;
+  giftButton.style.top = `${y}px`;
+}
+giftButton.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' || e.pointerType === 'pen') escapeGift(e); });
+giftButton.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') escapeGift(e); });
+giftButton.addEventListener('click', () => {
+  if (escapes < teasing.length || Date.now() - lastEscapeAt < 350) return;
+  alert('ERROR 404: Gift not found!.');
+  showScreen('verify');
 });
 
-let escapes = 0;
-const teasing = [
-    "Too slow grandpa.",
-    "Your reflexes need an update..",
-    "Even the cake is faster than you..",
-    "Skill issue detected",
-    "ٌَAre you even trying?",
-    "Maybe try using both hands",
-    "This is getting embarrassing",
-    "Bro, the button is starting to feel sorry for you",
-    "One last chance. Don't embarrass yourself",
-    "Fine you win, Happy now?"
-];
-
-giftButton.onmouseover = function() {
-    if (escapes < 10) {
-        escapes++;
-        document.getElementById("tease").textContent =
-            teasing[Math.min(escapes - 1, teasing.length - 1)];
-        
-        if (escapes === 10) {
-            giftButton.style.left = "50%";
-            giftButton.style.top = "50%";
-        } else {
-    
-            giftButton.style.left = Math.random() * 70 + "vw";
-            giftButton.style.top = Math.random() * 70 + "vh";
-        }
-    }
+// 2. Verification requires BOTH answers.
+let triedYes = false, triedNo = false;
+function checkIdentityComplete() { if (triedYes && triedNo) $('continueBtn').hidden = false; }
+$('yesBtn').onclick = () => {
+  triedYes = true;
+  $('result').textContent = "That's exactly what an impostor would say ;)";
+  $('yesBtn').hidden = true;
+  if (!triedNo) $('noBtn').textContent = "Fine, I'm not.";
+  checkIdentityComplete();
+};
+$('noBtn').onclick = () => {
+  triedNo = true;
+  $('result').textContent = 'Finally, an honest answer. Identity still suspicious.';
+  $('noBtn').hidden = true;
+  checkIdentityComplete();
+};
+$('continueBtn').onclick = () => {
+  alert('Verification failed successfully. access granted.');
+  showScreen('loading');
+  startLoading();
 };
 
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const result = document.getElementById("result");
-
-yesBtn.onclick = function() {
-    result.textContent = "Suspicious. A real brother would hesitate.";
-    document.getElementById("continueBtn").style.display = "inline-block";
-};
-
-noBtn.onclick = function() {
-    result.textContent = "IDENTIFY FRAUD DETECTED!";
-    document.getElementById("continueBtn").style.display = "inline-block"
-};
-
-document.getElementById("continueBtn").onclick = function() {
-    alert("Verification failed successfully. access granted.");
-
-    document.getElementById("verify").style.display = "none";
-    document.getElementById("loading").style.display = "block";
-
-    startLoading();
-};
+// 3. Loading bar goes to 99%, reverses to 50%, then cake emergency.
+let loadingStarted = false;
 function startLoading() {
-    let number = 0;
-    let direction = 1;
-
-    const timer = setInterval(function() {
-        number += direction;
-
-        document.getElementById("bar").value = number;
-        document.getElementById("percent").textContent = number + "%";
-
-        if(number === 99) {
-            direction = -1;
-            document.getElementById("bar").classList.add("escape");
-            document.getElementById("status").textContent = "Oops. your gift is escaping!";
-        }
-
-        if (number === 50 && direction === -1) {
-            clearInterval(timer);
-            alertSound();
-            document.getElementById("status").classList.add("danger");
-            document.getElementById("status").textContent =
-            "SYSTEM FAILURE: Your birthday cake has escaped.";
-            
-            document.getElementById("nextBtn").style.display = "inline-block";
-
-        }
-    }, 100);
+  if (loadingStarted) return;
+  loadingStarted = true;
+  let number = 0, direction = 1;
+  const timer = setInterval(() => {
+    number += direction;
+    $('bar').value = number;
+    $('percent').textContent = `${number}%`;
+    if (number === 99) {
+      direction = -1;
+      $('bar').classList.add('escape');
+      $('status').textContent = 'Oops. your gift is escaping!';
+    }
+    if (number === 50 && direction === -1) {
+      clearInterval(timer);
+      emergencySound();
+      $('status').classList.add('danger');
+      $('status').textContent = 'SYSTEM FAILURE: Your birthday cake has escaped.';
+      $('nextBtn').hidden = false;
+      $('cakeEscapeScene').hidden = false;
+      $('cakeEscapeScene').classList.add('runaway');
+    }
+  }, 55);
 }
-document.getElementById("nextBtn").onclick = function() {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("quiz").style.display = "block";
-    showQuestion();
+$('nextBtn').onclick = () => { showScreen('quiz'); showQuestion(); };
+
+// 4. Three-question brother exam.
+const questions = [
+  [
+    'NASA has detected an unidentified object approaching Earth. It appears to be your birthday cake. What do you do?',
+    'Prepare a landing zone in the kitchen.',
+    'Tell NASA to keep the candles away from the engines.',
+    'Ask whether the cake comes with free delivery.'
+  ],
+  [
+    'A mysterious penguin arrives at your door carrying a birthday cake. What do you do?',
+    'Invite him in. He seems trustworthy.',
+    'Ask why a penguin knows my address.',
+    "Accept the cake. Don't ask questions."
+  ],
+  [
+    'What is the correct way to celebrate your birthday?',
+    'Enjoy a peaceful, normal day.',
+    'Demand gifts and royal treatment.',
+    'Complete a suspicious website made by your sibling.'
+  ]
+];
+const reactions = {
+  a: [
+    'NASA confirms landing clearance. The kitchen is now an international spaceport.',
+    "Excellent. You've adopted a penguin.",
+    'Incorrect. Peace was never an option.'
+  ],
+  b: [
+    'Excellent thinking. The candles have been classified as rocket boosters.',
+    'Security has confirmed the penguin works for us.',
+    'Your Majesty, the budget has been rejected.'
+  ],
+  c: [
+    'Yes, but the delivery guy ate half of it during the flight.',
+    'Wise decision. The penguin appreciates your cooperation.',
+    'Correct. Unfortunately, there are still more security checks.'
+  ]
 };
- const questions = [
-    ["Who is the best sibling?", "You", "Me"],
-    ["Who deserves more cake?", "You", "Me"],
-    ["Am I your favorite sibling?", "Yes", "Obviously"]
- ];
-
- let q = 0
- let answered = false;
-
- function showQuestion() {
-    document.getElementById("counter").textContent = "Question " + (q + 1) + "/" + questions.length;
-    answered = false
-    document.getElementById("question").textContent = questions[q][0];
-    document.getElementById("a").textContent = questions[q][1];
-    document.getElementById("b").textContent = questions[q][2];
-    document.getElementById("feedback").textContent = "";
-    document.getElementById("nextQ").disabled = true;
- }
-
- document.getElementById("a").onclick = function() {
+let q = 0, answered = false;
+function showQuestion() {
+  answered = false;
+  $('counter').textContent = `Question ${q + 1}/${questions.length}`;
+  $('question').textContent = questions[q][0];
+  ['a','b','c'].forEach((letter, index) => {
+    $(letter).textContent = `${letter.toUpperCase()}. ${questions[q][index + 1]}`;
+    $(letter).classList.remove('selected');
+    $(letter).disabled = false;
+  });
+  $('feedback').textContent = '';
+  $('nextQ').disabled = true;
+  $('nextQ').textContent = q === questions.length - 1 ? 'See my results' : 'Next question';
+}
+['a','b','c'].forEach(letter => {
+  $(letter).onclick = () => {
+    if (answered) return;
     answered = true;
-    document.getElementById("nextQ").disabled = false;
-    document.getElementById("feedback").textContent = 
-    ["Wrong! very suspecious.",
-    "Wrong. The cake comittee is disappointed.",
-    "Your confidence is conserning."][q];
- };
+    $('feedback').textContent = reactions[letter][q];
+    $('nextQ').disabled = false;
+    ['a','b','c'].forEach(other => { $(other).disabled = true; });
+    $(letter).classList.add('selected');
+  };
+});
+$('nextQ').onclick = () => {
+  if (!answered) return;
+  q++;
+  if (q < questions.length) return showQuestion();
+  $('quiz').innerHTML = `
+    <div class="panel">
+      <div class="certificate">
+        <p>OFFICIAL BROTHER CERTIFICATE</p>
+        <h2>LEGENDARY STATUS</h2>
+        <p>This certifies that you have successfully survived the Brother Examination.</p>
+        <div class="cert-score"><h2>100%</h2><small>Results may be fabricated.</small></div>
+        <p>Three questions. Zero preparation. Somehow, you passed.</p>
+        <hr>
+        <p>Validity: Until you annoy me again.</p>
+        <p>Birthday gift access: GRANTED</p>
+      </div>
+      <button id="giftNext" type="button">Claim your reward</button>
+    </div>`;
+  $('giftNext').onclick = () => showScreen('gifts');
+};
 
- document.getElementById("b").onclick = function() {
-    answered = true;
-    document.getElementById("nextQ").disabled = false;
-    document.getElementById("feedback").textContent = 
-    ["Correct! Unfortunately.",
-     "Bold choice. The cake has been notified.",
-     "Obviously. took you long enough."][q];
- };
+// 5. Five fake gifts, then the real surprise.
+const gifts = [
+  'Congratulations! you found...another box.',
+  'Wait. this one is DEFINITELY the real gift.',
+  'ERROR 404: Gift not found.',
+  'Almost there.Probably.',
+  'Okay okay, last box..I PROMISE.'
+];
+let box = 0;
+$('boxBtn').onclick = () => {
+  const giftBox = $('boxBtn');
+  giftBox.classList.remove('opening');
+  void giftBox.offsetWidth;
+  giftBox.classList.add('opening');
+  setTimeout(() => giftBox.classList.remove('opening'), 800);
+  if (box === gifts.length) {
+    alertSound();
+    alert('SECURITY ALERT!\nSuspicious levels of handsomeness detected.\nProceed at your own risk.');
+    $('gifts').innerHTML = `
+      <div class="final-card">
+        <h1>HAPPY BIRTHDAY!</h1>
+        <h2>MISSION COMPLETE</h2>
+        <div class="birthday-cake" aria-label="Birthday cake with three lit candles" role="img">
+          <div class="candles"><span></span><span></span><span></span></div>
+          <div class="cake-top"></div><div class="cake-bottom"></div>
+        </div>
+        <p>After all that nonsense, you finally made it.</p>
+        <p>There's no secret prize, no hidden treasure, and unfortunately, no free cake.</p>
+        <p>But here's the real surprise...</p>
+        <h3>I learned to code just to make this ridiculous website for you :3 <span class="little-help">(with some little help ;))</span></h3>
+        <p>Happy birthday big bro</p>
+        <p>Now go get yourself some cake</p>
+      </div>`;
+    confetti();
+    victorySound();
+    return;
+  }
+  $('giftMessage').textContent = gifts[box];
+  box++;
+  if (box === gifts.length) {
+    document.querySelector('#boxBtn .gift-label').textContent = 'UNLOCK FINAL GIFT';
+    giftBox.setAttribute('aria-label','Unlock final gift');
+  }
+};
 
- document.getElementById("nextQ").onclick = function() {
-    q++;
-
-    if (q < questions.length) {
-        showQuestion();
-    } else {
-        document.getElementById("quiz").innerHTML = `
-            <h2>OFFICIAL BROTHER CERTIFICATE</h2>
-            <h3>BARELY APPROVED</h3>
-            <p>This certifies that you have successfully
-            survived the Brother Examination.</p>
-            <p>Score: 100% (results may be fabricated)</p>
-            <p>Validity: Until you annoy me again.</p>
-            <button id="giftNext">Claim your reward</button>
-         `;
-         document.getElementById("giftNext").onclick = function() {
-            document.getElementById("quiz").style.display = "none";
-            document.getElementById("gifts").style.display = "block";
-         };
-    }
- };
-
- let box = 0
-
- const gifts = [
-    "Congratulations! you found...another box.",
-    "Wait. this one is DEFINITELY the real gift.",
-    "ERROR 404: Gift not found.",
-    "Almost there.Probably.",
-    "Okay okay, last box..I PROMISE."  
- ];
-
- document.getElementById("boxBtn").onclick = function() {
-    
-    if (box === gifts.length) {
-        alertSound();
-
-        alert("SECURITY ALERT!\nSuspicious levels of handsomeness detected. \nProceed at your oun risk..");
-        document.getElementById("gifts").innerHTML = `
-            <h1>HAPPY BIRTHDAY!</h1>
-            <h2>MISSION COMPLETE</h2>
-            <p>After all that nonesence, you finally made it.</p>
-            <p>There's no secret prize, no hidden treasure, and infortunately, no free cake.</p>
-            <p>But here's the real surprise...</p>
-            <h3>I learned to code just to make this ridiculous website for you :3</h3>
-            <p>Happy birthday big bro</p>
-            <p>Now go get yourself some cake</p>
-        `;
-        confetti();
-        return;
-    }
-    document.getElementById("gifts").querySelector("p").textContent = gifts[box];
-
-    box++;
-    
-    if (box === gifts.length) {
-        document.getElementById("boxBtn").textContent =
-        "UNLOCK FINAL GIFT";
-    }
- };
- function alertSound() { const audio = new AudioContext();
-    [440, 330].forEach((freq, i) => {
-        const beep = audio.createOscillator();
-        const volume = audio.createGain();
-    
-        beep.connect(volume);
-        volume.connect(audio.destination);
-    
-        beep.frequency.value = freq;
-        volume.gain.value = 0.08;
-    
-        beep.start(audio.currentTime + i * 0.2);
-        beep.stop(audio.currentTime + (i + 1) * 0.2);
-    });
-    }
-
-    function confetti() { const colors = ["red", "gold", "purple", "blue", "lime"];
-        for (let i = 0; i < 200; i++) {
-            const piece = document.createElement("div");
-            piece.className = "confetti";
-        
-            piece.style.left = Math.random() * 100 + "vw";
-            piece.style.background = colors[i % colors.length];
-            piece.style.animationDelay = Math.random() * 2 + "s";
-        
-            document.body.appendChild(piece);
-        
-            setTimeout(() => piece.remove(), 6000);
-        }
-        }
+// Original audio and confetti, with compatibility fixes.
+function audioContext() {
+  const AudioClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioClass) return null;
+  try { return new AudioClass(); } catch { return null; }
+}
+function playTones(notes, type = 'sine', duration = .2, gainValue = .06) {
+  const audio = audioContext();
+  if (!audio) return;
+  notes.forEach((frequency, i) => {
+    const osc = audio.createOscillator(), gain = audio.createGain();
+    const start = audio.currentTime + i * duration;
+    osc.type = type;
+    osc.frequency.value = frequency;
+    osc.connect(gain); gain.connect(audio.destination);
+    gain.gain.setValueAtTime(gainValue, start);
+    gain.gain.exponentialRampToValueAtTime(.001, start + duration * .94);
+    osc.start(start); osc.stop(start + duration);
+  });
+  setTimeout(() => audio.close().catch(() => {}), (notes.length * duration + .5) * 1000);
+}
+function alertSound() { playTones([440,330], 'sine', .2, .08); }
+function victorySound() { playTones([523,659,784,1046], 'square', .15, .06); }
+function emergencySound() {
+  const audio = audioContext();
+  if (!audio) return;
+  const osc = audio.createOscillator(), gain = audio.createGain();
+  osc.type = 'sawtooth'; osc.connect(gain); gain.connect(audio.destination);
+  const start = audio.currentTime;
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.linearRampToValueAtTime(.045,start+.08);
+  gain.gain.setValueAtTime(.045,start+1.3);
+  gain.gain.linearRampToValueAtTime(.0001,start+1.5);
+  for(let i=0;i<6;i++) {
+    osc.frequency.setValueAtTime(400,start+i*.25);
+    osc.frequency.linearRampToValueAtTime(780,start+i*.25+.125);
+    osc.frequency.linearRampToValueAtTime(400,start+(i+1)*.25);
+  }
+  osc.start(start); osc.stop(start+1.5);
+  setTimeout(() => audio.close().catch(() => {}), 2200);
+}
+function confetti() {
+  const colors = ['#f3abc8','#a181c7','#ffca70','#92b7e3','#b9d9a9'];
+  for (let i = 0; i < 200; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 6000);
+  }
+}
